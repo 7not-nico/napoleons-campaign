@@ -1,213 +1,238 @@
 """
 Napoleon's Campaign - UI Module
 
-Handles all user interface and display logic.
+Handles all user interface and display logic using Rich.
 """
 
 import os
 from typing import Dict, List, Any
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.markdown import Markdown
+from rich.prompt import IntPrompt, Confirm
+from rich.layout import Layout
+from rich.align import Align
+from rich.text import Text
+from rich import box
+
+# Initialize global console
+console = Console()
 
 
 def clear_screen() -> None:
     """Clear the terminal screen."""
-    os.system("clear" if os.name == "posix" else "cls")
+    console.clear()
 
 
 def show_main_menu() -> int:
     """Display the main menu and get user choice."""
-    print("\n" + "=" * 50)
-    print("         NAPOLEON'S CAMPAIGN")
-    print("=" * 50)
-    print("1. Start New Campaign")
-    print("2. Load Saved Game")
-    print("3. View Instructions")
-    print("4. Exit Game")
-    print("=" * 50)
-
-    while True:
-        try:
-            choice = int(input("\nEnter your choice (1-4): "))
-            if 1 <= choice <= 4:
-                return choice
-            else:
-                print("Please enter a number between 1 and 4.")
-        except ValueError:
-            print("Please enter a valid number.")
+    console.print(
+        Panel.fit(
+            "[bold gold1]NAPOLEON'S CAMPAIGN[/bold gold1]\n[italic]A Historical Strategy Game[/italic]",
+            border_style="blue",
+            padding=(1, 2),
+        )
+    )
+    
+    menu_table = Table(show_header=False, box=None)
+    menu_table.add_row("[bold cyan]1.[/bold cyan] Start New Campaign")
+    menu_table.add_row("[bold cyan]2.[/bold cyan] Load Saved Game")
+    menu_table.add_row("[bold cyan]3.[/bold cyan] View Instructions")
+    menu_table.add_row("[bold cyan]4.[/bold cyan] Exit Game")
+    
+    console.print(menu_table)
+    
+    return IntPrompt.ask("\n[bold green]Enter your choice[/bold green]", choices=["1", "2", "3", "4"])
 
 
 def show_status(game_state: Dict[str, Any]) -> None:
     """Display the current game status."""
     player = game_state["player"]
-
-    print(f"\n{'=' * 60}")
-    print(f"Year: {game_state['year']} | Season: {game_state['season'].title()}")
-    print(f"Emperor: {player['name']}")
-    print(
-        f"Troops: {player['troops']:,} | Gold: {player['gold']:,} | Morale: {player['morale']}/100"
+    
+    # Create a main table for status
+    table = Table(title=f"Year: {game_state['year']} | Season: {game_state['season'].title()}", box=box.ROUNDED, expand=True)
+    
+    table.add_column("Emperor", style="bold gold1")
+    table.add_column("Resources", style="cyan")
+    table.add_column("Diplomacy", style="magenta")
+    
+    resources = (
+        f"Troops: {player['troops']:,}\n"
+        f"Gold:   {player['gold']:,}\n"
+        f"Morale: {player['morale']}/100"
     )
-    print(
-        f"Territories: {len(player['territories'])} | Allies: {len(player['allies'])} | Enemies: {len(player['enemies'])}"
+    
+    diplomacy = (
+        f"Territories: {len(player['territories'])}\n"
+        f"Allies:      {len(player['allies'])}\n"
+        f"Enemies:     {len(player['enemies'])}"
     )
-    print(f"Turn: {game_state['turn_count']}")
-    print(f"{'=' * 60}")
+    
+    table.add_row(player['name'], resources, diplomacy)
+    
+    console.print(table)
 
 
 def show_event(event: Dict[str, Any]) -> None:
     """Display a historical event."""
-    print(f"\n{'=' * 60}")
-    print(f"HISTORICAL EVENT - {event['year']}")
-    print(f"{event['title'].upper()}")
-    print(f"{'=' * 60}")
-    print(f"\n{event['description']}\n")
+    title = f"[bold red]{event['title'].upper()}[/bold red] ({event['year']})"
+    description = Markdown(event['description'])
+    
+    console.print(Panel(description, title=title, border_style="red", padding=(1, 2)))
 
-    print("Your choices:")
+    console.print("\n[bold]Your choices:[/bold]")
     for i, choice in enumerate(event["choices"], 1):
-        print(f"{i}. {choice['text']}")
-
-    print(f"{'=' * 60}")
+        console.print(f"[bold cyan]{i}.[/bold cyan] {choice['text']}")
+    
+    console.print(f"\n[italic]Turn: {event.get('turn_count', 'N/A')}[/italic]", style="dim")
 
 
 def get_player_choice(event: Dict[str, Any]) -> int:
     """Get the player's choice for an event."""
     num_choices = len(event["choices"])
-
-    while True:
-        try:
-            choice = int(input(f"\nEnter your choice (1-{num_choices}): "))
-            if 1 <= choice <= num_choices:
-                return choice - 1  # Convert to 0-based index
-            else:
-                print(f"Please enter a number between 1 and {num_choices}.")
-        except ValueError:
-            print("Please enter a valid number.")
+    choices_str = [str(i) for i in range(1, num_choices + 1)]
+    
+    choice = IntPrompt.ask(
+        f"\n[bold green]Enter your choice[/bold green]", 
+        choices=choices_str
+    )
+    return choice - 1  # Convert to 0-based index
 
 
 def show_game_over(game_state: Dict[str, Any]) -> None:
     """Display the game over screen."""
-    print(f"\n{'=' * 60}")
-    print("GAME OVER")
-    print(f"{'=' * 60}")
-
     if game_state.get("victory_condition"):
-        print(f"\n🎉 VICTORY ACHIEVED: {game_state['victory_condition'].upper()} 🎉")
-        print("\nYour leadership has shaped the destiny of Europe!")
+        title = f"🎉 VICTORY ACHIEVED: {game_state['victory_condition'].upper()} 🎉"
+        style = "bold green"
+        message = "Your leadership has shaped the destiny of Europe!"
     else:
-        print("\n💔 DEFEAT 💔")
-        print("\nThe empire has fallen. Your legacy will be debated for centuries.")
+        title = "💔 DEFEAT 💔"
+        style = "bold red"
+        message = "The empire has fallen. Your legacy will be debated for centuries."
 
-    print(f"\nFinal Statistics:")
+    console.print(Panel(f"[center]{message}[/center]", title=f"[{style}]{title}[/{style}]", border_style=style.split()[-1]))
+
     player = game_state["player"]
-    print(f"- Troops: {player['troops']:,}")
-    print(f"- Gold: {player['gold']:,}")
-    print(f"- Morale: {player['morale']}/100")
-    print(f"- Territories: {len(player['territories'])}")
-    print(f"- Allies: {len(player['allies'])}")
-    print(f"- Enemies: {len(player['enemies'])}")
-    print(f"- Years in Power: {game_state['year'] - 1796}")
-    print(f"- Historical Accuracy: {game_state['historical_accuracy']}%")
-
-    print(f"\n{'=' * 60}")
+    stats_table = Table(title="Final Statistics", show_header=False, box=box.SIMPLE)
+    stats_table.add_row("Troops", f"{player['troops']:,}")
+    stats_table.add_row("Gold", f"{player['gold']:,}")
+    stats_table.add_row("Morale", f"{player['morale']}/100")
+    stats_table.add_row("Territories", str(len(player['territories'])))
+    stats_table.add_row("Allies", str(len(player['allies'])))
+    stats_table.add_row("Enemies", str(len(player['enemies'])))
+    stats_table.add_row("Years in Power", str(game_state['year'] - 1796))
+    stats_table.add_row("Historical Accuracy", f"{game_state['historical_accuracy']}%")
+    
+    console.print(stats_table)
 
 
 def show_instructions() -> None:
     """Display detailed game instructions."""
     clear_screen()
-    print("=== NAPOLEON'S CAMPAIGN - INSTRUCTIONS ===\n")
+    
+    markdown_text = """
+# NAPOLEON'S CAMPAIGN - INSTRUCTIONS
 
-    print("OVERVIEW:")
-    print("You are Napoleon Bonaparte, commanding France through")
-    print("the turbulent years of the French Revolution and Napoleonic Wars.\n")
+## OVERVIEW
+You are **Napoleon Bonaparte**, commanding France through the turbulent years of the French Revolution and Napoleonic Wars.
 
-    print("GAMEPLAY:")
-    print("- Make strategic decisions at key historical moments")
-    print("- Manage your troops, gold, morale, and territories")
-    print("- Fight battles and form diplomatic alliances")
-    print("- Your choices determine the fate of Europe\n")
+## GAMEPLAY
+- Make strategic decisions at key historical moments
+- Manage your troops, gold, morale, and territories
+- Fight battles and form diplomatic alliances
+- Your choices determine the fate of Europe
 
-    print("RESOURCES:")
-    print("- TROOPS: Military strength for battles")
-    print("- GOLD: Economic power and army maintenance")
-    print("- MORALE: Public support and army effectiveness")
-    print("- TERRITORIES: Land control and resource generation\n")
+## RESOURCES
+- **TROOPS**: Military strength for battles
+- **GOLD**: Economic power and army maintenance
+- **MORALE**: Public support and army effectiveness
+- **TERRITORIES**: Land control and resource generation
 
-    print("VICTORY CONDITIONS:")
-    print("- Military: Control most of Europe")
-    print("- Diplomatic: Form lasting alliances")
-    print("- Historical: Follow Napoleon's actual path\n")
+## VICTORY CONDITIONS
+- **Military**: Control most of Europe
+- **Diplomatic**: Form lasting alliances
+- **Historical**: Follow Napoleon's actual path
 
-    print("DEFEAT CONDITIONS:")
-    print("- Troops below 5,000")
-    print("- Gold below 0")
-    print("- Morale below 20")
-    print("- Lose France\n")
+## DEFEAT CONDITIONS
+- Troops below 5,000
+- Gold below 0
+- Morale below 20
+- Lose France
 
-    print("CONTROLS:")
-    print("- Use number keys (1-4) to select options")
-    print("- Type 'save' to save your progress")
-    print("- Follow on-screen prompts\n")
-
-    print("STRATEGY TIPS:")
-    print("- Balance military expansion with economic stability")
-    print("- High morale improves battle performance")
-    print("- Allies provide diplomatic and military bonuses")
-    print("- Historical accuracy unlocks special achievements\n")
+## CONTROLS
+- Use number keys to select options
+- Type 'save' to save your progress
+- Follow on-screen prompts
+    """
+    
+    console.print(Markdown(markdown_text))
+    console.input("\n[dim]Press Enter to continue...[/dim]")
 
 
 def show_battle_result(
     attacker: str, defender: str, result: str, casualties: int
 ) -> None:
     """Display battle results."""
-    print(f"\n{'=' * 40}")
-    print(f"BATTLE RESULT")
-    print(f"{'=' * 40}")
-    print(f"{attacker} vs {defender}")
-    print(f"Outcome: {result}")
-    print(f"Casualties: {casualties:,}")
-    print(f"{'=' * 40}\n")
+    color = "green" if result == "victory" else "red"
+    
+    panel = Panel(
+        f"[bold]{attacker} vs {defender}[/bold]\n"
+        f"Outcome: [{color}]{result.upper()}[/{color}]\n"
+        f"Casualties: {casualties:,}",
+        title="BATTLE RESULT",
+        border_style=color
+    )
+    console.print(panel)
 
 
 def show_diplomacy_result(nation: str, result: str, gold_change: int = 0) -> None:
     """Display diplomacy results."""
-    print(f"\n{'=' * 40}")
-    print(f"DIPLOMACY RESULT")
-    print(f"{'=' * 40}")
-    print(f"Nation: {nation}")
-    print(f"Result: {result}")
+    content = f"Nation: [bold]{nation}[/bold]\nResult: {result}"
     if gold_change != 0:
-        print(f"Gold Change: {'+' if gold_change > 0 else ''}{gold_change:,}")
-    print(f"{'=' * 40}\n")
+        sign = "+" if gold_change > 0 else ""
+        color = "green" if gold_change > 0 else "red"
+        content += f"\nGold Change: [{color}]{sign}{gold_change:,}[/{color}]"
+        
+    console.print(Panel(content, title="DIPLOMACY RESULT", border_style="magenta"))
 
 
 def show_resource_change(changes: Dict[str, int]) -> None:
     """Display resource changes after an event."""
-    print("\nResource Changes:")
+    if not changes:
+        return
+        
+    text = Text()
     for resource, change in changes.items():
         if change != 0:
             sign = "+" if change > 0 else ""
-            print(f"  {resource.title()}: {sign}{change:,}")
+            color = "green" if change > 0 else "red"
+            text.append(f"{resource.title()}: {sign}{change:,}\n", style=color)
+            
+    console.print(Panel(text, title="Resource Changes", border_style="blue", width=40))
 
 
 def show_territories(territories: List[str]) -> None:
     """Display controlled territories."""
     if territories:
-        print(f"\nControlled Territories ({len(territories)}):")
+        console.print(f"\n[bold]Controlled Territories ({len(territories)}):[/bold]")
         for territory in territories:
-            print(f"  • {territory}")
+            console.print(f"  • {territory}")
     else:
-        print("\nNo territories controlled.")
+        console.print("\n[dim]No territories controlled.[/dim]")
 
 
 def show_allies_and_enemies(allies: List[str], enemies: List[str]) -> None:
     """Display current diplomatic status."""
     if allies:
-        print(f"\nAllies ({len(allies)}):")
+        console.print(f"\n[bold green]Allies ({len(allies)}):[/bold green]")
         for ally in allies:
-            print(f"  ✓ {ally}")
+            console.print(f"  ✓ {ally}")
 
     if enemies:
-        print(f"\nEnemies ({len(enemies)}):")
+        console.print(f"\n[bold red]Enemies ({len(enemies)}):[/bold red]")
         for enemy in enemies:
-            print(f"  ✗ {enemy}")
+            console.print(f"  ✗ {enemy}")
 
 
 def show_historical_note(event_id: str) -> None:
@@ -220,31 +245,24 @@ def show_historical_note(event_id: str) -> None:
     }
 
     if event_id in notes:
-        print(f"\n📚 Historical Note: {notes[event_id]}")
+        console.print(Panel(f"[italic]{notes[event_id]}[/italic]", title="📚 Historical Note", border_style="yellow"))
 
 
 def show_loading_message(message: str = "Loading...") -> None:
     """Display a loading message."""
-    print(f"\n{message}")
+    console.print(f"[dim]{message}[/dim]")
 
 
 def show_error_message(message: str) -> None:
     """Display an error message."""
-    print(f"\n❌ Error: {message}")
+    console.print(f"[bold red]❌ Error: {message}[/bold red]")
 
 
 def show_success_message(message: str) -> None:
     """Display a success message."""
-    print(f"\n✅ {message}")
+    console.print(f"[bold green]✅ {message}[/bold green]")
 
 
 def confirm_action(message: str) -> bool:
     """Get user confirmation for an action."""
-    while True:
-        response = input(f"\n{message} (y/n): ").lower()
-        if response in ["y", "yes"]:
-            return True
-        elif response in ["n", "no"]:
-            return False
-        else:
-            print("Please enter 'y' or 'n'.")
+    return Confirm.ask(message)

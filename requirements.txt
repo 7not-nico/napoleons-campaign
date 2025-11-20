@@ -1,7 +1,8 @@
 # Napoleon's Campaign - Requirements
 
 ## Core Dependencies
-# No external dependencies required - using Python standard library only
+typer>=0.9.0
+rich>=13.0.0
 
 ## Optional Dependencies (for future enhancements)
 # colorama>=0.4.4  # For colored terminal output
