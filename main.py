@@ -9,7 +9,7 @@ making historical decisions that shape the fate of Europe.
 import sys
 import typer
 from typing import Optional
-from game_logic import process_turn, check_game_over
+from game_logic import process_turn, check_game_over, initialize_game
 from ui import (
     show_main_menu,
     show_status,
@@ -20,6 +20,7 @@ from ui import (
     clear_screen,
     show_error_message,
     show_success_message,
+    show_map,
 )
 from data import get_initial_game_state
 from utils import save_game, load_game
@@ -42,7 +43,7 @@ def run_game_loop(game_state):
             show_event(current_event)
 
             # Get player choice
-            choice = get_player_choice(current_event)
+            choice = get_player_choice(current_event, game_state)
 
             # Process the choice and update game state
             game_state = process_turn(game_state, choice)
@@ -68,13 +69,16 @@ def run_game_loop(game_state):
         
         from rich.prompt import Prompt
         action = Prompt.ask(
-            "\n[dim]Press Enter to continue, or type 'save' to save[/dim]", 
+            "\n[dim]Press Enter to continue, type 'map' to view map, or 'save' to save[/dim]", 
             default=""
         ).lower()
         
         if action == "save":
             save_game(game_state)
             show_success_message("Game saved!")
+            Prompt.ask("[dim]Press Enter to continue...[/dim]")
+        elif action == "map":
+            show_map(game_state)
             Prompt.ask("[dim]Press Enter to continue...[/dim]")
 
     # Game over screen
@@ -85,6 +89,7 @@ def run_game_loop(game_state):
 def play():
     """Start a new campaign."""
     game_state = get_initial_game_state()
+    game_state = initialize_game(game_state)
     run_game_loop(game_state)
 
 

@@ -5,6 +5,7 @@ Contains all game data structures, historical events, and initial game state.
 """
 
 from typing import Dict, List, Any
+from roguelike_data import TRAITS, RANDOM_EVENTS, GENERALS, ARTIFACTS
 
 
 def get_initial_game_state() -> Dict[str, Any]:
@@ -20,6 +21,9 @@ def get_initial_game_state() -> Dict[str, Any]:
             "territories": ["France"],
             "allies": [],
             "enemies": ["Austria", "Britain", "Russia", "Prussia"],
+            "traits": [],
+            "generals": [],
+            "artifacts": [],
         },
         "current_event": get_event("italian_campaign_1796"),
         "game_over": False,
@@ -1122,3 +1126,51 @@ def get_defeat_conditions() -> Dict[str, Dict]:
             "territory": "France",
         },
     }
+
+
+def get_random_events() -> Dict[str, Any]:
+    """Return all random events."""
+    return RANDOM_EVENTS
+
+
+def get_trait(trait_id: str) -> Dict[str, Any]:
+    """Get trait data by ID."""
+    return TRAITS.get(trait_id, {})
+
+
+def get_general(general_id: str) -> Dict[str, Any]:
+    """Get general data by ID."""
+    return GENERALS.get(general_id, {})
+
+
+def get_artifact(artifact_id: str) -> Dict[str, Any]:
+    """Get artifact data by ID."""
+    return ARTIFACTS.get(artifact_id, {})
+
+
+# Map Data
+MAP_DIMENSIONS = (90, 30)  # Width, Height
+
+TERRITORY_NODES = {
+    "France":  {"x": 35, "y": 12, "w": 14, "h": 5, "label": "FRA"},
+    "Spain":   {"x": 15, "y": 20, "w": 12, "h": 4, "label": "SPA"},
+    "Britain": {"x": 30, "y": 2,  "w": 12, "h": 4, "label": "GBR"},
+    "Germany": {"x": 55, "y": 10, "w": 12, "h": 4, "label": "GER"},
+    "Austria": {"x": 60, "y": 18, "w": 12, "h": 4, "label": "AUS"},
+    "Russia":  {"x": 75, "y": 8,  "w": 12, "h": 6, "label": "RUS"},
+    "Italy":   {"x": 45, "y": 22, "w": 12, "h": 4, "label": "ITA"},
+    "Prussia": {"x": 60, "y": 4,  "w": 12, "h": 4, "label": "PRU"},
+}
+
+MAP_CONNECTIONS = [
+    ("France", "Spain"),
+    ("France", "Britain"),
+    ("France", "Germany"),
+    ("France", "Italy"),
+    ("Germany", "Austria"),
+    ("Germany", "Russia"),
+    ("Germany", "Prussia"),
+    ("Austria", "Italy"),
+    ("Austria", "Russia"),
+    ("Prussia", "Russia"),
+]

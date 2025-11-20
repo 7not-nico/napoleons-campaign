@@ -5,12 +5,13 @@ Handles all user interface and display logic using Rich.
 """
 
 import os
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 from rich.console import Console
+from data import get_trait, get_general, get_artifact, MAP_DIMENSIONS, TERRITORY_NODES, MAP_CONNECTIONS
 from rich.table import Table
 from rich.panel import Panel
 from rich.markdown import Markdown
-from rich.prompt import IntPrompt, Confirm
+from rich.prompt import Prompt, IntPrompt, Confirm
 from rich.layout import Layout
 from rich.align import Align
 from rich.text import Text
@@ -32,6 +33,8 @@ ICON_START = ""
 ICON_LOAD = ""
 ICON_RULES = ""
 ICON_EXIT = ""
+ICON_GENERAL = ""
+ICON_ARTIFACT = ""
 
 
 def clear_screen() -> None:
@@ -87,13 +90,164 @@ def show_status(game_state: Dict[str, Any]) -> None:
     
     console.print(table)
 
+    # Show Traits
+    if player.get("traits"):
+        traits_text = Text()
+        for trait_id in player["traits"]:
+            trait = get_trait(trait_id)
+            traits_text.append(f"• {trait['name']}: ", style="bold yellow")
+            traits_text.append(f"{trait['description']}\n")
+        
+        console.print(Panel(traits_text, title="Active Traits", border_style="yellow"))
+
+    # Show Generals
+    if player.get("generals"):
+        generals_text = Text()
+        for general_id in player["generals"]:
+            general = get_general(general_id)
+            status_color = "green" if general["status"] == "active" else "red"
+            generals_text.append(f"{ICON_GENERAL} {general['name']} ({general['status'].title()}): ", style=f"bold {status_color}")
+            generals_text.append(f"{general['description']}\n")
+        
+        console.print(Panel(generals_text, title="Generals", border_style="blue"))
+
+    # Show Artifacts
+    if player.get("artifacts"):
+        artifacts_text = Text()
+        for artifact_id in player["artifacts"]:
+            artifact = get_artifact(artifact_id)
+            artifacts_text.append(f"{ICON_ARTIFACT} {artifact['name']}: ", style="bold magenta")
+            artifacts_text.append(f"{artifact['description']}\n")
+        
+        console.print(Panel(artifacts_text, title="Artifacts", border_style="magenta"))
+
+
+class MapCanvas:
+    """A simple character-based canvas for drawing the map."""
+    
+    def __init__(self, width: int, height: int):
+        self.width = width
+        self.height = height
+        self.grid = [[" " for _ in range(width)] for _ in range(height)]
+        
+    def draw_line(self, x0: int, y0: int, x1: int, y1: int, char: str = "·"):
+        """Draw a line using Bresenham's algorithm."""
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1
+        sy = 1 if y0 < y1 else -1
+        err = dx - dy
+        
+        while True:
+            if 0 <= x0 < self.width and 0 <= y0 < self.height:
+                # Don't overwrite existing boxes or labels if possible, but for lines we might need to.
+                # Let's just draw.
+                if self.grid[y0][x0] == " ":
+                    self.grid[y0][x0] = char
+            
+            if x0 == x1 and y0 == y1:
+                break
+                
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x0 += sx
+            if e2 < dx:
+                err += dx
+                y0 += sy
+
+    def draw_box(self, x: int, y: int, w: int, h: int, label: str, border_color: str = "white"):
+        """Draw a box with a label."""
+        # Draw top and bottom
+        for i in range(w):
+            if 0 <= x + i < self.width:
+                if 0 <= y < self.height:
+                    self.grid[y][x + i] = f"[{border_color}]─[/{border_color}]"
+                if 0 <= y + h - 1 < self.height:
+                    self.grid[y + h - 1][x + i] = f"[{border_color}]─[/{border_color}]"
+        
+        # Draw sides
+        for i in range(h):
+            if 0 <= y + i < self.height:
+                if 0 <= x < self.width:
+                    self.grid[y + i][x] = f"[{border_color}]│[/{border_color}]"
+                if 0 <= x + w - 1 < self.width:
+                    self.grid[y + i][x + w - 1] = f"[{border_color}]│[/{border_color}]"
+                    
+        # Corners
+        if 0 <= y < self.height and 0 <= x < self.width:
+            self.grid[y][x] = f"[{border_color}]┌[/{border_color}]"
+        if 0 <= y < self.height and 0 <= x + w - 1 < self.width:
+            self.grid[y][x + w - 1] = f"[{border_color}]┐[/{border_color}]"
+        if 0 <= y + h - 1 < self.height and 0 <= x < self.width:
+            self.grid[y + h - 1][x] = f"[{border_color}]└[/{border_color}]"
+        if 0 <= y + h - 1 < self.height and 0 <= x + w - 1 < self.width:
+            self.grid[y + h - 1][x + w - 1] = f"[{border_color}]┘[/{border_color}]"
+            
+        # Label
+        label_x = x + (w - len(label)) // 2
+        label_y = y + h // 2
+        if 0 <= label_y < self.height:
+            for i, char in enumerate(label):
+                if 0 <= label_x + i < self.width:
+                    self.grid[label_y][label_x + i] = f"[bold {border_color}]{char}[/bold {border_color}]"
+
+    def render(self) -> Text:
+        """Render the grid to a Text object."""
+        output = Text()
+        for row in self.grid:
+            output.append("".join(row) + "\n")
+        return output
+
+
+def show_map(game_state: Dict[str, Any]) -> None:
+    """Display the game map."""
+    canvas = MapCanvas(MAP_DIMENSIONS[0], MAP_DIMENSIONS[1])
+    player = game_state["player"]
+    
+    # Draw connections first
+    for start_node, end_node in MAP_CONNECTIONS:
+        start = TERRITORY_NODES[start_node]
+        end = TERRITORY_NODES[end_node]
+        
+        # Calculate centers
+        start_x = start["x"] + start["w"] // 2
+        start_y = start["y"] + start["h"] // 2
+        end_x = end["x"] + end["w"] // 2
+        end_y = end["y"] + end["h"] // 2
+        
+        canvas.draw_line(start_x, start_y, end_x, end_y, char="·")
+        
+    # Draw territories
+    for name, node in TERRITORY_NODES.items():
+        # Determine color
+        if name in player["territories"]:
+            color = "blue"
+        elif name in player["enemies"]:
+            color = "red"
+        elif name in player["allies"]:
+            color = "green"
+        else:
+            color = "white"
+            
+        canvas.draw_box(node["x"], node["y"], node["w"], node["h"], node["label"], color)
+        
+    console.print(Panel(canvas.render(), title="Strategic Map", border_style="blue"))
+
 
 def show_event(event: Dict[str, Any]) -> None:
     """Display a historical event."""
-    title = f"[bold red]{event['title'].upper()}[/bold red] ({event['year']})"
+    is_random = event.get("type") == "random"
+    border_style = "red" if not is_random else "magenta"
+    title_prefix = "" if not is_random else "🎲 RANDOM EVENT: "
+    
+    title = f"[bold {border_style}]{title_prefix}{event['title'].upper()}[/bold {border_style}]"
+    if "year" in event:
+        title += f" ({event['year']})"
+        
     description = Markdown(event['description'])
     
-    console.print(Panel(description, title=title, border_style="red", padding=(1, 2)))
+    console.print(Panel(description, title=title, border_style=border_style, padding=(1, 2)))
 
     console.print("\n[bold]Your choices:[/bold]")
     for i, choice in enumerate(event["choices"], 1):
@@ -102,16 +256,22 @@ def show_event(event: Dict[str, Any]) -> None:
     console.print(f"\n[italic]Turn: {event.get('turn_count', 'N/A')}[/italic]", style="dim")
 
 
-def get_player_choice(event: Dict[str, Any]) -> int:
+def get_player_choice(event: Dict[str, Any], game_state: Dict[str, Any]) -> int:
     """Get the player's choice for an event."""
     num_choices = len(event["choices"])
-    choices_str = [str(i) for i in range(1, num_choices + 1)]
+    valid_choices = [str(i) for i in range(1, num_choices + 1)]
     
-    choice = IntPrompt.ask(
-        f"\n[bold green]Enter your choice[/bold green]", 
-        choices=choices_str
-    )
-    return choice - 1  # Convert to 0-based index
+    while True:
+        choice = Prompt.ask(
+            f"\n[bold green]Enter your choice (or 'm' for map)[/bold green]", 
+            choices=valid_choices + ["m", "M"]
+        ).lower()
+        
+        if choice == "m":
+            show_map(game_state)
+            continue
+            
+        return int(choice) - 1  # Convert to 0-based index
 
 
 def show_game_over(game_state: Dict[str, Any]) -> None:
