@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T14:14:26.782642",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"A Mysterious Package Arrives from Paris\",\n  \"description\": \"A courier arrives bearing a sealed package from the Directory in Paris. It contains a finely crafted music box and a cryptic note hinting at political machinations. The Directory seems to be testing your loyalty and subtly demanding a show of support.\",\n  \"choices\": [\n    {\n      \"text\": \"Publicly praise the Directory's wisdom and leadership.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 1000,\n        \"morale\": -5\n      }\n    },\n    {\n      \"text\": \"Send a polite but noncommittal reply, focusing on military victories.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": 5\n      }\n    },\n    {\n      \"text\": \"Ignore the message, focusing solely on the Italian campaign.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": -500,\n        \"morale\": 10\n      }\n    }\n  ]\n}\n```"
+  }
+}

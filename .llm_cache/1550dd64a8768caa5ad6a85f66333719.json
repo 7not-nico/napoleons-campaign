@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T14:05:12.901325",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"A Mysterious Messenger from Genoa\",\n  \"description\": \"A hooded figure arrives at your camp, bearing a sealed letter from a Genovese noble. The letter speaks of a hidden cache of ancient Roman arms and armor, rumored to be of exceptional quality, buried somewhere in the Ligurian mountains. The noble offers to guide you, for a price.\",\n  \"choices\": [\n    {\n      \"text\": \"Trust the messenger and seek the cache.\",\n      \"consequences\": {\n        \"troops\": -500,\n        \"gold\": -2000,\n        \"morale\": 5\n      }\n    },\n    {\n      \"text\": \"Dismiss the tale as fanciful and focus on the campaign.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": 0\n      }\n    },\n    {\n      \"text\": \"Seize the messenger and interrogate him for information.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 500,\n        \"morale\": -10\n      }\n    }\n  ]\n}\n```"
+  }
+}

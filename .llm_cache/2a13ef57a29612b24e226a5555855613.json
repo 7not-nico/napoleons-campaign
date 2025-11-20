@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T13:56:01.289080",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"A Cache of Ancient Roman Coins Discovered\",\n  \"description\": \"While encamped near Turin, a company of sappers unearths a hidden cache of Roman coins. The local populace is abuzz with excitement, and rumors of further treasures spread like wildfire. The coins could be sold, or used to inspire the troops.\",\n  \"choices\": [\n    {\n      \"text\": \"Seize the coins for the war effort.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 1500,\n        \"morale\": -5\n      }\n    },\n    {\n      \"text\": \"Distribute the coins amongst the troops to bolster morale.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": -300,\n        \"morale\": 10\n      }\n    },\n    {\n      \"text\": \"Return the coins to the local populace, earning their goodwill.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": 5\n      }\n    }\n  ]\n}\n```"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T14:13:03.759238",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"A Mysterious Envoy Arrives from the Papal States\",\n  \"description\": \"A hooded figure bearing the insignia of the Papal States requests a private audience. He claims to possess knowledge of a vast treasure hidden within the Vatican archives, offered in exchange for protection against Austrian aggression. His information seems credible, but could be a trap.\",\n  \"choices\": [\n    {\n      \"text\": \"Grant the envoy an audience and investigate the claim.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 3000,\n        \"morale\": 5\n      }\n    },\n    {\n      \"text\": \"Dismiss the envoy as a charlatan and ignore his offer.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": -2\n      }\n    },\n    {\n      \"text\": \"Seize the envoy and interrogate him for further intelligence.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 1000,\n        \"morale\": -10\n      }\n    }\n  ]\n}\n```"
+  }
+}

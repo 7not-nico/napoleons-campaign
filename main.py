@@ -24,6 +24,8 @@ from ui import (
 )
 from data import get_initial_game_state
 from utils import save_game, load_game
+from npc_dialogue import handle_npc_dialogue
+from goal_manager import handle_goals
 
 # Initialize Typer app
 app = typer.Typer(help="Napoleon's Campaign - A Historical Strategy Game")
@@ -69,7 +71,7 @@ def run_game_loop(game_state):
         
         from rich.prompt import Prompt
         action = Prompt.ask(
-            "\n[dim]Press Enter to continue, type 'map' to view map, or 'save' to save[/dim]", 
+            "\n[dim]Press Enter to continue, type 'map' to view map, 'talk' to speak, 'goals' to manage objectives, or 'save' to save[/dim]", 
             default=""
         ).lower()
         
@@ -80,6 +82,10 @@ def run_game_loop(game_state):
         elif action == "map":
             show_map(game_state)
             Prompt.ask("[dim]Press Enter to continue...[/dim]")
+        elif action == "talk":
+            handle_npc_dialogue(game_state)
+        elif action == "goals":
+            handle_goals(game_state)
 
     # Game over screen
     show_game_over(game_state)

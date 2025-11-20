@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T13:54:49.672364",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"Whispers of Treachery in the Directory\",\n  \"description\": \"A coded message intercepted from Paris reveals a faction within the Directory plotting to undermine your authority. They seek to replace you with a more pliable general, fearing your ambition. Swift action is paramount to secure your position.\",\n  \"choices\": [\n    {\n      \"text\": \"Confront the Directory directly, demanding loyalty.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": -2000,\n        \"morale\": 10\n      }\n    },\n    {\n      \"text\": \"Secretly investigate and expose the conspirators.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": -1000,\n        \"morale\": 5\n      }\n    },\n    {\n      \"text\": \"Ignore the rumors, focusing solely on the campaign.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": -10\n      }\n    }\n  ]\n}\n```"
+  }
+}

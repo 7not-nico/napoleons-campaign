@@ -1,0 +1,92 @@
+{
+  "year": 1796,
+  "season": "spring",
+  "player": {
+    "name": "Napoleon Bonaparte",
+    "troops": 37000,
+    "gold": 7900,
+    "morale": 95,
+    "territories": [
+      "France",
+      "Northern Italy",
+      "Lombardy"
+    ],
+    "allies": [],
+    "enemies": [
+      "Austria",
+      "Britain",
+      "Russia",
+      "Prussia"
+    ],
+    "traits": [],
+    "generals": [],
+    "artifacts": []
+  },
+  "npcs": {
+    "berthier": {
+      "id": "berthier",
+      "name": "Marshal Louis-Alexandre Berthier",
+      "role": "Chief of Staff",
+      "personality": "Organized, efficient, detail-oriented. Master of logistics and planning. Less interested in glory than in smooth operations. Speaks with administrative precision.",
+      "relationship": 77,
+      "conversation_history": [
+        {
+          "timestamp": "2025-11-20T14:07:49.284483",
+          "player": "We meed an analog computer",
+          "npc": "An analog computer, sir? I shall have my staff investigate the feasibility and logistical requirements of such a device, though I confess I am unfamiliar with the precise specifications. Perhaps a detailed schematic would assist in our assessment.",
+          "relationship_before": 75
+        }
+      ],
+      "metadata": {}
+    }
+  },
+  "current_event": {
+    "id": "italian_campaign_1796",
+    "year": 1796,
+    "title": "The Italian Campaign",
+    "description": "The French Directory has appointed you to command the Army of Italy.\nThe Austrian Empire threatens French borders. You have 50,000 troops under your command.\nThe Italian peninsula offers rich resources and strategic advantages.\n\nWill you launch an aggressive offensive or proceed cautiously?",
+    "choices": [
+      {
+        "text": "Launch aggressive offensive against Austrian forces",
+        "consequences": {
+          "troops": -8000,
+          "gold": 5000,
+          "morale": 15,
+          "territories": [
+            "Northern Italy"
+          ],
+          "enemies": [],
+          "next_event": "austrian_counterattack_1796"
+        }
+      },
+      {
+        "text": "Build fortifications and wait for reinforcements",
+        "consequences": {
+          "troops": 5000,
+          "gold": -2000,
+          "morale": -5,
+          "territories": [],
+          "enemies": [],
+          "next_event": "austrian_invasion_1796"
+        }
+      },
+      {
+        "text": "Negotiate with local Italian states for alliances",
+        "consequences": {
+          "troops": 2000,
+          "gold": 1000,
+          "morale": 5,
+          "territories": [],
+          "allies": [
+            "Kingdom of Sardinia"
+          ],
+          "next_event": "italian_alliance_1796"
+        }
+      }
+    ]
+  },
+  "game_over": false,
+  "victory_condition": null,
+  "historical_accuracy": 100,
+  "turn_count": 4,
+  "llm_client": 

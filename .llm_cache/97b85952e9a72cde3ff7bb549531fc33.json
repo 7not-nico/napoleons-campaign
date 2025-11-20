@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-11-20T14:08:55.105194",
+  "prompt": "You are narrating Napoleon's Campaign, a historical strategy game.\n\nCURRENT GAME STATE:\n- Year: 1796",
+  "model": "google/gemini-2.0-flash",
+  "response": {
+    "text": "```json\n{\n  \"title\": \"A Mysterious Discovery in Milan\",\n  \"description\": \"While quartering in Milan, your troops unearth a hidden chamber beneath an ancient palazzo. Inside, they find a cache of Roman artifacts and a coded scroll. Scholars whisper of a lost legion's treasure and strategic secrets.\",\n  \"choices\": [\n    {\n      \"text\": \"Seize the treasure for the Republic!\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 3000,\n        \"morale\": -5\n      }\n    },\n    {\n      \"text\": \"Dedicate resources to deciphering the scroll.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": -1000,\n        \"morale\": 5\n      }\n    },\n    {\n      \"text\": \"Leave the artifacts undisturbed; focus on the war.\",\n      \"consequences\": {\n        \"troops\": 0,\n        \"gold\": 0,\n        \"morale\": 0\n      }\n    }\n  ]\n}\n```"
+  }
+}

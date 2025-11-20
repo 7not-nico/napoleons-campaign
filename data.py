@@ -23,8 +23,10 @@ def get_initial_game_state() -> Dict[str, Any]:
             "enemies": ["Austria", "Britain", "Russia", "Prussia"],
             "traits": [],
             "generals": [],
-            "artifacts": [],
+            "artifacts": []  # Unique items found
         },
+        "npcs": {},  # NPC instances by ID
+        "goals": [],  # Player-defined objectives
         "current_event": get_event("italian_campaign_1796"),
         "game_over": False,
         "victory_condition": None,

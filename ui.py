@@ -8,6 +8,7 @@ import os
 from typing import Dict, List, Any, Tuple
 from rich.console import Console
 from data import get_trait, get_general, get_artifact, MAP_DIMENSIONS, TERRITORY_NODES, MAP_CONNECTIONS
+from npc_system import get_available_npcs, get_npc
 from rich.table import Table
 from rich.panel import Panel
 from rich.markdown import Markdown
@@ -233,6 +234,71 @@ def show_map(game_state: Dict[str, Any]) -> None:
         canvas.draw_box(node["x"], node["y"], node["w"], node["h"], node["label"], color)
         
     console.print(Panel(canvas.render(), title="Strategic Map", border_style="blue"))
+
+
+def show_available_npcs(game_state: Dict[str, Any]) -> None:
+    """Show list of available NPCs to talk to."""
+    from rich.prompt import Prompt
+    
+    available_ids = get_available_npcs(game_state)
+    
+    if not available_ids:
+        console.print("[dim]No one is available to talk to at the moment.[/dim]\n")
+        return
+    
+    console.print(Panel.fit(
+        "[bold cyan]💬 Available Characters[/bold cyan]",
+        border_style="cyan"
+    ))
+    
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    
+    for npc_id in available_ids:
+        npc_data = get_npc(npc_id)
+        if npc_data:
+            table.add_row(f"[cyan]{npc_id}[/cyan]", f"{npc_data['name']} ({npc_data['role']})")
+    
+    console.print(table)
+    console.print("\n[dim]Type NPC ID to talk (e.g., 'ney'), or 'back' to return[/dim]\n")
+
+
+def show_npc_dialogue(npc: Any, response: str, relationship: int, 
+                     relationship_change: int) -> None:
+    """Display NPC dialogue response."""
+    from rich.align import Align
+    
+    # Relationship indicator
+    if relationship > 70:
+        rel_text = "[green]Very Loyal[/green]"
+        rel_icon = "💚"
+    elif relationship > 50:
+        rel_text = "[blue]Loyal[/blue]"
+        rel_icon = "💙"
+    elif relationship > 30:
+        rel_text = "[yellow]Neutral[/yellow]"
+        rel_icon = "💛"
+    else:
+        rel_text = "[red]Distrustful[/red]"
+        rel_icon = "💔"
+    
+    # Relationship change indicator
+    if relationship_change > 0:
+        change_text = f"[green]+{relationship_change}[/green] ↑"
+    elif relationship_change < 0:
+        change_text = f"[red]{relationship_change}[/red] ↓"
+    else:
+        change_text = ""
+    
+    # Build dialogue panel
+    dialogue_content = f"{rel_icon} {npc.name}\n"
+    dialogue_content += f"[dim]Relationship: {relationship}/100 {rel_text} {change_text}[/dim]\n\n"
+    dialogue_content += f"{response}"
+    
+    console.print(Panel(
+        dialogue_content,
+        title=f"[bold]{npc.role}[/bold]",
+        border_style="cyan"
+    ))
 
 
 def show_event(event: Dict[str, Any]) -> None:
