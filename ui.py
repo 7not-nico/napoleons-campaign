@@ -19,6 +19,20 @@ from rich import box
 # Initialize global console
 console = Console()
 
+# Nerd Font Icons
+ICON_TROOPS = ""
+ICON_GOLD = ""
+ICON_MORALE = ""
+ICON_TERRITORY = ""
+ICON_ALLY = ""
+ICON_ENEMY = ""
+ICON_VICTORY = ""
+ICON_DEFEAT = ""
+ICON_START = ""
+ICON_LOAD = ""
+ICON_RULES = ""
+ICON_EXIT = ""
+
 
 def clear_screen() -> None:
     """Clear the terminal screen."""
@@ -36,10 +50,10 @@ def show_main_menu() -> int:
     )
     
     menu_table = Table(show_header=False, box=None)
-    menu_table.add_row("[bold cyan]1.[/bold cyan] Start New Campaign")
-    menu_table.add_row("[bold cyan]2.[/bold cyan] Load Saved Game")
-    menu_table.add_row("[bold cyan]3.[/bold cyan] View Instructions")
-    menu_table.add_row("[bold cyan]4.[/bold cyan] Exit Game")
+    menu_table.add_row(f"[bold cyan]1.[/bold cyan] {ICON_START} Start New Campaign")
+    menu_table.add_row(f"[bold cyan]2.[/bold cyan] {ICON_LOAD} Load Saved Game")
+    menu_table.add_row(f"[bold cyan]3.[/bold cyan] {ICON_RULES} View Instructions")
+    menu_table.add_row(f"[bold cyan]4.[/bold cyan] {ICON_EXIT} Exit Game")
     
     console.print(menu_table)
     
@@ -58,15 +72,15 @@ def show_status(game_state: Dict[str, Any]) -> None:
     table.add_column("Diplomacy", style="magenta")
     
     resources = (
-        f"Troops: {player['troops']:,}\n"
-        f"Gold:   {player['gold']:,}\n"
-        f"Morale: {player['morale']}/100"
+        f"{ICON_TROOPS} Troops: {player['troops']:,}\n"
+        f"{ICON_GOLD} Gold:   {player['gold']:,}\n"
+        f"{ICON_MORALE} Morale: {player['morale']}/100"
     )
     
     diplomacy = (
-        f"Territories: {len(player['territories'])}\n"
-        f"Allies:      {len(player['allies'])}\n"
-        f"Enemies:     {len(player['enemies'])}"
+        f"{ICON_TERRITORY} Territories: {len(player['territories'])}\n"
+        f"{ICON_ALLY} Allies:      {len(player['allies'])}\n"
+        f"{ICON_ENEMY} Enemies:     {len(player['enemies'])}"
     )
     
     table.add_row(player['name'], resources, diplomacy)
@@ -103,11 +117,11 @@ def get_player_choice(event: Dict[str, Any]) -> int:
 def show_game_over(game_state: Dict[str, Any]) -> None:
     """Display the game over screen."""
     if game_state.get("victory_condition"):
-        title = f"🎉 VICTORY ACHIEVED: {game_state['victory_condition'].upper()} 🎉"
+        title = f"{ICON_VICTORY} VICTORY ACHIEVED: {game_state['victory_condition'].upper()} {ICON_VICTORY}"
         style = "bold green"
         message = "Your leadership has shaped the destiny of Europe!"
     else:
-        title = "💔 DEFEAT 💔"
+        title = f"{ICON_DEFEAT} DEFEAT {ICON_DEFEAT}"
         style = "bold red"
         message = "The empire has fallen. Your legacy will be debated for centuries."
 
@@ -115,12 +129,12 @@ def show_game_over(game_state: Dict[str, Any]) -> None:
 
     player = game_state["player"]
     stats_table = Table(title="Final Statistics", show_header=False, box=box.SIMPLE)
-    stats_table.add_row("Troops", f"{player['troops']:,}")
-    stats_table.add_row("Gold", f"{player['gold']:,}")
-    stats_table.add_row("Morale", f"{player['morale']}/100")
-    stats_table.add_row("Territories", str(len(player['territories'])))
-    stats_table.add_row("Allies", str(len(player['allies'])))
-    stats_table.add_row("Enemies", str(len(player['enemies'])))
+    stats_table.add_row(f"{ICON_TROOPS} Troops", f"{player['troops']:,}")
+    stats_table.add_row(f"{ICON_GOLD} Gold", f"{player['gold']:,}")
+    stats_table.add_row(f"{ICON_MORALE} Morale", f"{player['morale']}/100")
+    stats_table.add_row(f"{ICON_TERRITORY} Territories", str(len(player['territories'])))
+    stats_table.add_row(f"{ICON_ALLY} Allies", str(len(player['allies'])))
+    stats_table.add_row(f"{ICON_ENEMY} Enemies", str(len(player['enemies'])))
     stats_table.add_row("Years in Power", str(game_state['year'] - 1796))
     stats_table.add_row("Historical Accuracy", f"{game_state['historical_accuracy']}%")
     
@@ -207,7 +221,13 @@ def show_resource_change(changes: Dict[str, int]) -> None:
         if change != 0:
             sign = "+" if change > 0 else ""
             color = "green" if change > 0 else "red"
-            text.append(f"{resource.title()}: {sign}{change:,}\n", style=color)
+            
+            icon = ""
+            if resource == "troops": icon = ICON_TROOPS
+            elif resource == "gold": icon = ICON_GOLD
+            elif resource == "morale": icon = ICON_MORALE
+            
+            text.append(f"{icon} {resource.title()}: {sign}{change:,}\n", style=color)
             
     console.print(Panel(text, title="Resource Changes", border_style="blue", width=40))
 
@@ -225,12 +245,12 @@ def show_territories(territories: List[str]) -> None:
 def show_allies_and_enemies(allies: List[str], enemies: List[str]) -> None:
     """Display current diplomatic status."""
     if allies:
-        console.print(f"\n[bold green]Allies ({len(allies)}):[/bold green]")
+        console.print(f"\n[bold green]{ICON_ALLY} Allies ({len(allies)}):[/bold green]")
         for ally in allies:
             console.print(f"  ✓ {ally}")
 
     if enemies:
-        console.print(f"\n[bold red]Enemies ({len(enemies)}):[/bold red]")
+        console.print(f"\n[bold red]{ICON_ENEMY} Enemies ({len(enemies)}):[/bold red]")
         for enemy in enemies:
             console.print(f"  ✗ {enemy}")
 
