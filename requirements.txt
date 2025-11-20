@@ -1,0 +1,13 @@
+# Napoleon's Campaign - Requirements
+
+## Core Dependencies
+# No external dependencies required - using Python standard library only
+
+## Optional Dependencies (for future enhancements)
+# colorama>=0.4.4  # For colored terminal output
+# pytest>=6.0.0   # For testing framework
+# black>=21.0.0    # For code formatting
+# flake8>=3.8.0   # For linting
+
+## Development Tools (optional)
+# python>=3.8      # Minimum Python version required
